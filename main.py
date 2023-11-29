@@ -2,7 +2,7 @@ from classes import University, Country
 import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
-test
+
 def check_data(list):
     for item in list:
         print(str(item))
@@ -45,6 +45,14 @@ def get_website():
     global website
     website = input_site.get("1.0", "end-1c")
     scrape_data(website)
+
+def get_list_options():
+    list_options = []
+    with open("schools.csv", "r") as stream:
+        reader = csv.reader(stream)
+        for row in reader:
+            list_options.append(row[2])
+    return list_options
 
 m = tk.Tk()
 m.title("University Search")
