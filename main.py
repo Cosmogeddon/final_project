@@ -2,7 +2,7 @@ from classes import University, Country
 import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
-
+test
 def check_data(list):
     for item in list:
         print(str(item))
