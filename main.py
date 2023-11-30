@@ -2,15 +2,22 @@ from classes import University, Country
 import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
+import requests
+import html
 
 def check_data(list): # this is a troubleshooting function
     for item in list:
         print(str(item))
 
 def write_csv(school): # this function writes the list of list objects to a csv file
-    with open("schools.csv", "w", newline='') as stream:
+    with open("schools.csv", "a", newline='') as stream:
         writer = csv.writer(stream)
         writer.writerows(iter(school))
+
+def clear_csv(): # this function clears the csv file
+    with open("schools.csv", "w") as stream:
+        stream.truncate(0)
+        add_dropdown()
 
 def read_csv(): # this function reads the csv file and prints it to the console
     with open("schools.csv", "r") as stream:
@@ -56,7 +63,7 @@ def get_list_options(): # this function gets the list of options for the drop do
         else:
             reader = csv.reader(stream)
             for row in reader:
-                list_options.append(row[2])
+                list_options.append(f"{row[0]}: {row[2]}")
         return list_options
     
 def add_dropdown(): # this function adds the drop down menu to the GUI
@@ -64,22 +71,24 @@ def add_dropdown(): # this function adds the drop down menu to the GUI
     clicked = tk.StringVar()
     clicked.set("Select a program")
     drop = tk.OptionMenu(m, clicked, *get_list_options())
-    drop.grid(row=12, column=5)
+    drop.grid(row=1, column=5)
 
 # --- GUI --- #
 
 m = tk.Tk() 
 m.title("University Search")
 label = tk.Label(m, text="Please enter the website: ")
-label.grid(row=12)
+label.grid(row=1)
 input_site = tk.Text(m, height=1, width=20)
-input_site.grid(row=12, column=1)
+input_site.grid(row=1, column=2)
 scrape_button = tk.Button(m, text="Scrape", command=get_website)
-scrape_button.grid(row=12, column=3)
+scrape_button.grid(row=1, column=3)
 read_button = tk.Button(m, text="Read", command=read_csv)
-read_button.grid(row=12, column=4)
+read_button.grid(row=1, column=4)
+clear_list_button = tk.Button(m, text="Clear CSV List", command=clear_csv)
+clear_list_button.grid(row=1, column=6)
 exit_button = tk.Button(m, text="Exit", command=m.destroy)
-exit_button.grid(row=12, column=7)
+exit_button.grid(row=1, column=7)
 
 if __name__ == "__main__":
     m.mainloop()
