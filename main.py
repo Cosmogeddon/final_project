@@ -18,7 +18,7 @@ def cleanup_duration(duration): # this function reformats the data stored in the
     duration = duration.replace("years", "")
     duration = duration.replace("year", "")
     duration = duration.replace(" ", "")
-    duration = duration.replace("½", ".5")
+    duration = duration.replace("Â½", ".5")
     duration = float(duration)
     return duration
 
@@ -29,7 +29,6 @@ def cleanup_data(lst): # this function reformats the data stored in the csv file
     lst[0][4] = clean_year
     return lst
 
-
 # --- Functions --- #
 def write_csv(school): # this function writes the list of list objects to a csv file
     with open("schools.csv", "a", newline='') as stream:
@@ -39,8 +38,6 @@ def write_csv(school): # this function writes the list of list objects to a csv 
 def clear_csv(): # this function clears the csv file
     with open("schools.csv", "w") as stream:
         stream.truncate(0)
-
-        
 
 def read_csv(): # this function reads the csv file and prints it to the console
     with open("schools.csv", "r") as stream:
@@ -89,19 +86,33 @@ def get_list_options(): # this function gets the list of options for the drop do
         return list_options
     
 def add_dropdown(): # this function adds the drop down menu to the GUI
-    global clicked
-    clicked = tk.StringVar()
-    clicked.set("Select a program")
-    drop = tk.OptionMenu(m, clicked, *get_list_options())
-    drop.grid(row=1, column=5)
+        global clicked
+        clicked = tk.StringVar()
+        clicked.set("Select a program")
+        drop = tk.OptionMenu(m, clicked, *get_list_options())
+        drop.grid(row=1, column=5)
 
 def update_choice_label(list): # this function updates the choice label
     new_line = '\n'
     tab = '\t'
     cost = list[0][3] * list[0][4]
-    display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]} {tab} Cost for whole study: {cost}")
-    col_total = calculate_col(list, cost_of_living)
-    display_col_label.config(text = f"{col_total}")
+    cost = '{:,.2f}'.format(cost)
+    display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]}")
+    display_col_label.config(text = f"{list[0][1]}")
+    col_list = calculate_col(list, cost_of_living)
+    if col_list == None:
+        display_col_label.config(text = f"COL: No data")
+    else:
+        salary = (5-int(list[0][4]))*col_list[3]
+        tuition_total= list[0][3] * list[0][4]
+        living_expenses = (60*(col_list[1]+col_list[2]))
+        five_year_total = salary - tuition_total - living_expenses # this calculates the total cost of living for 5 years ((5-study years)*salary) - (5 * cost of living)-(tuition*years of study))
+        display_salary_label.config(text = f"Total earnings for years working: {'{:,.2f}'.format(salary)}")
+        display_living_expenses_label.config(text = f"Living Expenses for all years: {'{:,.2f}'.format(living_expenses)}")
+        display_col_label.config(text = f"You'll need a nest egg of {'{:,.2f}'.format(-1*five_year_total)} to cover living expenses and tuition if you get a job right out of university.")
+
+
+
 
 def get_csv_row(program):
     row_data = []
@@ -111,9 +122,7 @@ def get_csv_row(program):
             if (f"{row[0]}: {row[2]}") == program:
                 row_data.append(row)
     row_data = cleanup_data(row_data)
-    print(row_data)
     return row_data
-
 
 def get_selected_program(): # this function gets the selected program from the drop down menu
     selected_program = clicked.get()
@@ -121,12 +130,11 @@ def get_selected_program(): # this function gets the selected program from the d
     update_choice_label(useful_data)
     return useful_data
 
-def calculate_col(list, col_table):
+def calculate_col(list, col_table): # this function matches the city to the cost of living table 
     for i in range(len(col_table)):
         if col_table[i][0] == list[0][1]:
+            print(col_table[i])
             return col_table[i]
-        
-
 
 # --- GUI --- #
 
@@ -150,6 +158,11 @@ display_col_label = tk.Label(m, text="COL: ")
 display_col_label.grid(row=3)
 display_program_info_button = tk.Button(m, text="Display program info", command=get_selected_program)
 display_program_info_button.grid(row=1, column=7)
+display_salary_label = tk.Label(m, text="Salary: ")
+display_salary_label.grid(row=5)
+display_living_expenses_label = tk.Label(m, text="Living Expenses: ")
+display_living_expenses_label.grid(row=6)
+
 
 if __name__ == "__main__":
     m.mainloop()
