@@ -23,11 +23,15 @@ class University(Country):
     def __repr__(self):
         return f"{self.name}, {self.location}, {self.program}, {self.cost}, {self.duration}"
     
+
+    
     def __iter__(self):
         return iter([self.name, self.location, self.program, self.cost, self.duration])
 
     def run(list):
         for item in list:
             print(str(item))
+
+
 
     

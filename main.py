@@ -3,12 +3,33 @@ import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
 import requests
-import html
 
-def check_data(list): # this is a troubleshooting function
-    for item in list:
-        print(str(item))
+# --- Calculations --- #
+def cleanup_dollars(cost): # this function reformats the data stored in the csv file to be used in calculations:
+    cost = cost.replace("$", "")
+    cost = cost.replace("$", "")
+    cost = cost.replace(",", "")
+    cost = cost.replace("USD / year", "")
+    cost = int(cost)
+    return cost
 
+def cleanup_duration(duration): # this function reformats the data stored in the csv file to be used in calculations:  
+    duration = duration.replace("years", "")
+    duration = duration.replace("year", "")
+    duration = duration.replace(" ", "")
+    duration = duration.replace("½", ".5")
+    duration = float(duration)
+    return duration
+
+def cleanup_data(lst): # this function reformats the data stored in the csv file to be used in calculations:
+    clean_dollar = cleanup_dollars(lst[0][3])
+    clean_year = cleanup_duration(lst[0][4])
+    lst[0][3] = clean_dollar
+    lst[0][4] = clean_year
+    return lst
+
+
+# --- Functions --- #
 def write_csv(school): # this function writes the list of list objects to a csv file
     with open("schools.csv", "a", newline='') as stream:
         writer = csv.writer(stream)
@@ -17,14 +38,14 @@ def write_csv(school): # this function writes the list of list objects to a csv 
 def clear_csv(): # this function clears the csv file
     with open("schools.csv", "w") as stream:
         stream.truncate(0)
-        add_dropdown()
+
+        
 
 def read_csv(): # this function reads the csv file and prints it to the console
     with open("schools.csv", "r") as stream:
         reader = csv.reader(stream)
         for row in reader:
             print(row)
-
 
 def create_list(list1, list2, list3, list4, list5): # this function creates a list of list objects of the Schools
     global uni_lists
@@ -73,6 +94,32 @@ def add_dropdown(): # this function adds the drop down menu to the GUI
     drop = tk.OptionMenu(m, clicked, *get_list_options())
     drop.grid(row=1, column=5)
 
+def update_choice_label(list): # this function updates the choice label
+    new_line = '\n'
+    tab = '\t'
+    cost = list[0][3] * list[0][4]
+    display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]} {tab} Cost for whole study: {cost}")
+
+def get_csv_row(program):
+    row_data = []
+    with open("schools.csv", "r") as stream:
+        reader = csv.reader(stream)
+        for row in reader:
+            if (f"{row[0]}: {row[2]}") == program:
+                row_data.append(row)
+    row_data = cleanup_data(row_data)
+    print(row_data)
+    return row_data
+
+
+def get_selected_program(): # this function gets the selected program from the drop down menu
+    selected_program = clicked.get()
+    useful_data = get_csv_row(selected_program)
+    update_choice_label(useful_data)
+    return useful_data
+
+
+
 # --- GUI --- #
 
 m = tk.Tk() 
@@ -88,7 +135,13 @@ read_button.grid(row=1, column=4)
 clear_list_button = tk.Button(m, text="Clear CSV List", command=clear_csv)
 clear_list_button.grid(row=1, column=6)
 exit_button = tk.Button(m, text="Exit", command=m.destroy)
-exit_button.grid(row=1, column=7)
+exit_button.grid(row=1, column=8)
+display_choice_label = tk.Label(m, text="Please select a program: ")
+display_choice_label.grid(row=2)
+display_col_label = tk.Label(m, text="COL: ")
+display_col_label.grid(row=3)
+display_program_info_button = tk.Button(m, text="Display program info", command=get_selected_program)
+display_program_info_button.grid(row=1, column=7)
 
 if __name__ == "__main__":
     m.mainloop()
