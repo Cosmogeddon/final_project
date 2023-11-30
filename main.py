@@ -3,6 +3,7 @@ import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
 import requests
+from col import cost_of_living
 
 # --- Calculations --- #
 def cleanup_dollars(cost): # this function reformats the data stored in the csv file to be used in calculations:
@@ -99,6 +100,7 @@ def update_choice_label(list): # this function updates the choice label
     tab = '\t'
     cost = list[0][3] * list[0][4]
     display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]} {tab} Cost for whole study: {cost}")
+    calculate_col(list, cost_of_living)
 
 def get_csv_row(program):
     row_data = []
@@ -118,6 +120,11 @@ def get_selected_program(): # this function gets the selected program from the d
     update_choice_label(useful_data)
     return useful_data
 
+def calculate_col(list, col_table):
+    for i in range(len(col_table)):
+        if col_table[i][0] == list[0][1]:
+            print(col_table[i])
+        
 
 
 # --- GUI --- #
