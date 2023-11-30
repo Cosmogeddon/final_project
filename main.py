@@ -100,7 +100,8 @@ def update_choice_label(list): # this function updates the choice label
     tab = '\t'
     cost = list[0][3] * list[0][4]
     display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]} {tab} Cost for whole study: {cost}")
-    calculate_col(list, cost_of_living)
+    col_total = calculate_col(list, cost_of_living)
+    display_col_label.config(text = f"{col_total}")
 
 def get_csv_row(program):
     row_data = []
@@ -123,7 +124,7 @@ def get_selected_program(): # this function gets the selected program from the d
 def calculate_col(list, col_table):
     for i in range(len(col_table)):
         if col_table[i][0] == list[0][1]:
-            print(col_table[i])
+            return col_table[i]
         
 
 
