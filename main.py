@@ -35,9 +35,7 @@ def write_csv(school): # this function writes the list of list objects to a csv 
         writer = csv.writer(stream)
         writer.writerows(iter(school))
 
-def clear_csv(): # this function clears the csv file
-    with open("schools.csv", "w") as stream:
-        stream.truncate(0)
+
 
 def read_csv(): # this function reads the csv file and prints it to the console
     with open("schools.csv", "r") as stream:
@@ -89,8 +87,9 @@ def add_dropdown(): # this function adds the drop down menu to the GUI
         global clicked
         clicked = tk.StringVar()
         clicked.set("Select a program")
+        global drop
         drop = tk.OptionMenu(m, clicked, *get_list_options())
-        drop.grid(row=1, column=5)
+        drop.grid(row=3, columnspan=7, sticky="ew")
 
 def update_choice_label(list): # this function updates the choice label
     new_line = '\n'
@@ -102,16 +101,24 @@ def update_choice_label(list): # this function updates the choice label
     col_list = calculate_col(list, cost_of_living)
     if col_list == None:
         display_col_label.config(text = f"COL: No data")
+        tuition_total= list[0][3] * list[0][4]
+        display_tuition_label.config(text = f"Total tuition for years studying: ${'{:,.2f}'.format(-1*tuition_total)}")
+        display_salary_label.config(text = f"Salary: No data")
+        display_living_expenses_label.config(text = f"Living Expenses: No data")
     else:
         salary = (5-int(list[0][4]))*col_list[3]
         tuition_total= list[0][3] * list[0][4]
         living_expenses = (60*(col_list[1]+col_list[2]))
         five_year_total = salary - tuition_total - living_expenses # this calculates the total cost of living for 5 years ((5-study years)*salary) - (5 * cost of living)-(tuition*years of study))
-        display_salary_label.config(text = f"Total earnings for years working: {'{:,.2f}'.format(salary)}")
-        display_living_expenses_label.config(text = f"Living Expenses for all years: {'{:,.2f}'.format(living_expenses)}")
-        display_col_label.config(text = f"You'll need a nest egg of {'{:,.2f}'.format(-1*five_year_total)} to cover living expenses and tuition if you get a job right out of university.")
+        display_tuition_label.config(text = f"Total tuition for years studying: ${'{:,.2f}'.format(-1*tuition_total)}")
+        display_salary_label.config(text = f"Total earnings for years working: ${'{:,.2f}'.format(salary)}")
+        display_living_expenses_label.config(text = f"Living Expenses for all years: ${'{:,.2f}'.format(-1*living_expenses)}")
+        display_col_label.config(text = f"You'll need a nest egg of ${'{:,.2f}'.format(-1*five_year_total)} to cover living expenses and tuition if you get a job right out of university.")
 
-
+def clear_csv(): # this function clears the csv file
+    with open("schools.csv", "w") as stream:
+        stream.truncate(0)
+    drop.destroy()
 
 
 def get_csv_row(program):
@@ -135,6 +142,7 @@ def calculate_col(list, col_table): # this function matches the city to the cost
         if col_table[i][0] == list[0][1]:
             print(col_table[i])
             return col_table[i]
+        
 
 # --- GUI --- #
 
@@ -144,25 +152,26 @@ label = tk.Label(m, text="Please enter the website: ")
 label.grid(row=1)
 input_site = tk.Text(m, height=1, width=20)
 input_site.grid(row=1, column=2)
+display_choice_label = tk.Label(m, text="Please select a program: ")
+display_choice_label.grid(row=2)
 scrape_button = tk.Button(m, text="Scrape", command=get_website)
 scrape_button.grid(row=1, column=3)
 read_button = tk.Button(m, text="Read", command=read_csv)
 read_button.grid(row=1, column=4)
-clear_list_button = tk.Button(m, text="Clear CSV List", command=clear_csv)
+clear_list_button = tk.Button(m, text="Reset Database", command=clear_csv)
 clear_list_button.grid(row=1, column=6)
-exit_button = tk.Button(m, text="Exit", command=m.destroy)
-exit_button.grid(row=1, column=8)
-display_choice_label = tk.Label(m, text="Please select a program: ")
-display_choice_label.grid(row=2)
-display_col_label = tk.Label(m, text="COL: ")
-display_col_label.grid(row=3)
-display_program_info_button = tk.Button(m, text="Display program info", command=get_selected_program)
-display_program_info_button.grid(row=1, column=7)
-display_salary_label = tk.Label(m, text="Salary: ")
-display_salary_label.grid(row=5)
 display_living_expenses_label = tk.Label(m, text="Living Expenses: ")
-display_living_expenses_label.grid(row=6)
-
+display_living_expenses_label.grid(row=6, columnspan=8, sticky="W")
+display_salary_label = tk.Label(m, text="Salary: ")
+display_salary_label.grid(row=7, columnspan=8, sticky="W")
+display_tuition_label = tk.Label(m, text="Tuition: ")
+display_tuition_label.grid(row=4, columnspan=8, sticky="W")
+display_col_label = tk.Label(m, text="Five-year outcome: ")
+display_col_label.grid(row=8, columnspan=8, sticky="W")
+display_program_info_button = tk.Button(m, text="Calculate program info", command=get_selected_program)
+display_program_info_button.grid(row=1, column=8)
+exit_button = tk.Button(m, text="Exit", command=m.destroy)
+exit_button.grid(row=1, column=9)
 
 if __name__ == "__main__":
     m.mainloop()
