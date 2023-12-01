@@ -110,6 +110,8 @@ def update_choice_label(list): # this function updates the choice label
     cost = list[0][3] * list[0][4]
     cost = '{:,.2f}'.format(cost)
     display_choice_label.config(text=f"Program selected: {list[0][0]}: {list[0][2]}")
+    display_duration_label.config(text=f"Duration: {list[0][4]} years")
+    display_annual_tuition_label.config(text=f"Annual Tuition: ${'{:,.2f}'.format(list[0][3])}")
     display_col_label.config(text = f"{list[0][1]}")
     col_list = calculate_col(list, cost_of_living)
     if col_list == None:
@@ -120,13 +122,17 @@ def update_choice_label(list): # this function updates the choice label
         display_living_expenses_label.config(text = f"Living Expenses: No data")
     else:
         salary = (5-int(list[0][4]))*col_list[3]
-        tuition_total= list[0][3] * list[0][4]
-        living_expenses = (60*(col_list[1]+col_list[2]))
-        five_year_total = salary - tuition_total - living_expenses # this calculates the total cost of living for 5 years ((5-study years)*salary) - (5 * cost of living)-(tuition*years of study))
-        display_tuition_label.config(text = f"Total tuition for years studying: ${'{:,.2f}'.format(-1*tuition_total)}")
+        tuition_total= ((list[0][3] * list[0][4])*-1)
+        living_expenses = (60*(col_list[1]+col_list[2])*-1)
+        living_while_studying_expenses = tuition_total + ((living_expenses/5) * list[0][4])
+        five_year_total = salary + tuition_total + living_expenses # this calculates the total cost of living for 5 years ((5-study years)*salary) - (5 * cost of living)-(tuition*years of study))
+        display_tuition_label.config(text = f"Total tuition for years studying: ${'{:,.2f}'.format(tuition_total)}")
         display_salary_label.config(text = f"Total earnings for years working: ${'{:,.2f}'.format(salary)}")
-        display_living_expenses_label.config(text = f"Living Expenses for all years: ${'{:,.2f}'.format(-1*living_expenses)}")
-        display_col_label.config(text = f"You'll need a nest egg of ${'{:,.2f}'.format(-1*five_year_total)} to cover living expenses and tuition if you get a job right out of university.")
+        display_living_expenses_label.config(text = f"Living Expenses for all years: ${'{:,.2f}'.format(living_expenses)}")
+        if five_year_total < 0:
+            display_col_label.config(text = f"To begin, you'll need ${'{:,.2f}'.format(-1*living_while_studying_expenses)} prior to working to afford living expenses and tuition while studying. Over 5 years, the whole endeavor will have cost you ${'{:,.2f}'.format(-1*five_year_total)}.")
+        else:
+            display_col_label.config(text = f"To begin, you'll need ${'{:,.2f}'.format(-1*living_while_studying_expenses)} prior to working to afford living expenses and tuition while studying. Over 5 years, the whole endeavor will allow you to gross ${'{:,.2f}'.format(five_year_total)}.")
 
 def clear_csv(): # this function clears the csv file
     with open("schools.csv", "w") as stream:
@@ -174,24 +180,28 @@ display_choice_label = tk.Label(m, text="Please select a program: ")
 display_choice_label.grid(row=2)
 scrape_button = tk.Button(m, text="Scrape", command=get_website)
 scrape_button.grid(row=1, column=3)
-read_button = tk.Button(m, text="Read", command=read_csv)
+read_button = tk.Button(m, text="Print All to Console", command=read_csv)
 read_button.grid(row=1, column=4)
 clear_list_button = tk.Button(m, text="Reset Database", command=clear_csv)
 clear_list_button.grid(row=1, column=6)
-display_living_expenses_label = tk.Label(m, text="Living Expenses: ")
-display_living_expenses_label.grid(row=6, columnspan=8, sticky="W")
+display_duration_label = tk.Label(m, text="Duration: ")
+display_duration_label.grid(row=8, columnspan=8, sticky="W")
+display_annual_tuition_label = tk.Label(m, text="Annual tuition price: ")
+display_annual_tuition_label.grid(row=9, columnspan=8, sticky="W")
+display_living_expenses_label = tk.Label(m, text="Net living expenses: ")
+display_living_expenses_label.grid(row=11, columnspan=8, sticky="W")
 display_salary_label = tk.Label(m, text="Salary: ")
-display_salary_label.grid(row=7, columnspan=8, sticky="W")
-display_tuition_label = tk.Label(m, text="Tuition: ")
-display_tuition_label.grid(row=4, columnspan=8, sticky="W")
+display_salary_label.grid(row=12, columnspan=8, sticky="W")
+display_tuition_label = tk.Label(m, text="Net cost for total tuition: ")
+display_tuition_label.grid(row=10, columnspan=8, sticky="W")
 display_col_label = tk.Label(m, text="Five-year outcome: ")
-display_col_label.grid(row=8, columnspan=8, sticky="W")
+display_col_label.grid(row=13, columnspan=8, sticky="W")
 display_program_info_button = tk.Button(m, text="Calculate program info", command=get_selected_program)
 display_program_info_button.grid(row=1, column=8)
 exit_button = tk.Button(m, text="Exit", command=m.destroy)
 exit_button.grid(row=1, column=9)
 label = tk.Label(m, text=get_current_date())
-label.grid(row=10, column=9)
+label.grid(row=14, column=9)
 
 if __name__ == "__main__":
     m.mainloop()

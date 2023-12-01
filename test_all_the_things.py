@@ -3,7 +3,7 @@ from classes import University, Country
 
 class TestUniversity(unittest.TestCase):
     def setUp(self):
-        self.university = University("DMACC", "Iowa", "Computer Science", 10000, 2)
+        self.university = University("DMACC", "Iowa", "Computer Science", '10000', '2')
 
     def tearDown(self):
         del self.university
@@ -18,10 +18,10 @@ class TestUniversity(unittest.TestCase):
         self.assertEqual(self.university.program, "Computer Science")
     
     def test_university_cost(self):
-        self.assertEqual(self.university.cost, 10000)
+        self.assertEqual(self.university.cost, '10000')
     
     def test_university_duration(self):
-        self.assertEqual(self.university.duration, 2)
+        self.assertEqual(self.university.duration, '2')
 
 
 class TestCountry(unittest.TestCase):
