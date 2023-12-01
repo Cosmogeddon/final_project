@@ -2,12 +2,21 @@ from classes import University, Country
 import tkinter as tk
 from bs4 import BeautifulSoup
 import csv
-import requests
+import datetime
 from col import cost_of_living
+import datetime
+
+# --- Get date --- #
+
+def get_current_date():
+    current_date = datetime.date.today()
+    return str(current_date)
+
+
 
 # --- Calculations --- #
 def cleanup_dollars(cost): # this function reformats the data stored in the csv file to be used in calculations:
-    cost = cost.replace("$", "")
+    cost = cost.replace("Free", "0")
     cost = cost.replace("$", "")
     cost = cost.replace(",", "")
     cost = cost.replace("USD / year", "")
@@ -67,9 +76,13 @@ def scrape_data(website): # this function scrapes the data from an html (webstie
 
 def get_website(): # this function gets the website from the user--is html for now for safety reasons
     global website
-    website = input_site.get("1.0", "end-1c")
-    scrape_data(website)
-    add_dropdown()
+    try:
+        website = input_site.get("1.0", "end-1c")
+        website != ""
+        scrape_data(website)
+        add_dropdown()
+    except:
+        raise ValueError("Please enter a valid website")
 
 def get_list_options(): # this function gets the list of options for the drop down menu
     list_options = []
@@ -119,6 +132,11 @@ def clear_csv(): # this function clears the csv file
     with open("schools.csv", "w") as stream:
         stream.truncate(0)
     drop.destroy()
+    display_choice_label.config(text="Please select a program: ")
+    display_col_label.config(text = "Five-year outcome: ")
+    display_tuition_label.config(text = "Tuition: ")
+    display_salary_label.config(text = "Salary: ")
+    display_living_expenses_label.config(text = "Living Expenses: ")
 
 
 def get_csv_row(program):
@@ -172,6 +190,8 @@ display_program_info_button = tk.Button(m, text="Calculate program info", comman
 display_program_info_button.grid(row=1, column=8)
 exit_button = tk.Button(m, text="Exit", command=m.destroy)
 exit_button.grid(row=1, column=9)
+label = tk.Label(m, text=get_current_date())
+label.grid(row=10, column=9)
 
 if __name__ == "__main__":
     m.mainloop()
